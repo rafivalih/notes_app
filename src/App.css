@@ -2,6 +2,7 @@
   text-align: center;
 }
 
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -36,3 +37,13 @@
     transform: rotate(360deg);
   }
 }
+
+
+#Home{
+  margin-top: 20px;
+}
+
+#Home:hover{
+  transform: scale(1.05,1.05);
+}
+
