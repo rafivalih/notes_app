@@ -8,7 +8,7 @@ export const Sidebar = () => {
      }
 
 	return (
-		<aside className="flex flex-col gap-5 border-r-2 w-[150px] border-zinc-800 h-screen  px-3">
+		<aside className="flex flex-col gap-5  h-screen  px-3">
 			<NavLink className={getStyles}  id="Home" to="/" >
 				<span className="material-icons">home</span>
 				<span>Home</span>

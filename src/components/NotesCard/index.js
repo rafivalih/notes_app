@@ -1,68 +1,104 @@
 import { useNotes } from "../../Context/contextApi";
-import { findingArchive } from '../../utils/findingArchive';
+import { findingArchive } from "../../utils/findingArchive";
 
-export const NotesCard = ({ id, text, title, isPinned }) => {
-	const { noteDispatch , archive } = useNotes();
+export const NotesCard = ({
+	id,
+	text,
+	title,
+	isPinned,
+	isInBin = false,
+	hidePin = false,
+}) => {
+	const { noteDispatch, archive } = useNotes();
 
-	const onClickPin = (id) => {
+	const isInsideArchive = findingArchive(archive, id);
+
+	const onClickPin = () => {
+		noteDispatch({ type: "PIN", payload: { id } });
+	};
+
+	const onClickArchive = () => {
+		if (!isInsideArchive) {
+			noteDispatch({ type: "ADD_ARCHIVE", payload: { id } });
+		} else {
+			noteDispatch({ type: "REMOVE_ARCHIVE", payload: { id } });
+		}
+	};
+
+	const moveToBin = () => {
 		noteDispatch({
-			type: "PIN",
-			payload: { id },
+			type: "MOVE_TO_BIN",
+			payload: { id, title, text, isPinned },
 		});
 	};
 
-	const onClickArchive = (id) => {
-		!isInsideArchive ? noteDispatch({
-			type: "ADD_ARCHIVE",
-			payload: { id },
-		}) : noteDispatch({
-			type : "REMOVE_ARCHIVE",
-			payload : { id },
-		})
+	const restoreFromBin = () => {
+		noteDispatch({ type: "RESTORE_FROM_BIN", payload: { id } });
 	};
 
-
-
-	const isInsideArchive = findingArchive (archive, id );
-
 	return (
-		<div
-			key={id}
-			className="border border-zinc-600 flex flex-wrap p-1 shadow-xl rounded-md w-[300px]"
-		>
-			<div className="flex justify-between p-2 w-full">
-				<p>{title}</p>
-				{
-					!isInsideArchive ? <button
-					className="cursor-pointer"
-					onClick={() => onClickPin(id)}
-				>
-					<span
-						className={
-							isPinned ? "material-icons" : "material-icons-outlined"}
-					>
-						push_pin
-					</span>
-				</button> : <></>
-				}
+		<div className="border border-zinc-600 flex flex-wrap p-1 shadow-xl rounded-md w-[350px]">
+			{/* Header: Title + Buttons */}
+			<div className="flex justify-between p-2 w-full items-start">
+				<p className="select-text">{title}</p>
+				<div	 className="flex gap-2">
+					{!isInsideArchive && !isInBin && !hidePin && (
+						<button
+							className="cursor-pointer text-gray-700 hover:text-black select-none"
+							onClick={onClickPin}
+						>
+							<span
+								className={
+									isPinned
+										? "material-icons select-none"
+										: "material-icons-outlined select-none"
+								}
+							>
+								push_pin
+							</span>
+						</button>
+					)}
 
+					{isInBin && (
+						<button
+							className="cursor-pointer text-gray-700 hover:text-black select-none"
+							onClick={restoreFromBin}
+						>
+							<span className="material-icons-outlined select-none">
+								restore_from_trash
+							</span>
+						</button>
+					)}
+				</div>
 			</div>
+
+			{/* Body: Text + Archive/Delete Buttons */}
 			<div className="flex justify-between p-1 w-full">
-				<span>{text}</span>
-				<div>
-					<button>
-					<span
-						className={ isInsideArchive ?"material-icons":"material-icons-outlined"}
-						onClick={() => onClickArchive(id)}
-					>
-						archive
-					</span>
-					</button>
-					<button>
-					<span className="material-icons">
-						delete_outline
-					</span>
-					</button>
+				<p className="select-text whitespace-pre-wrap break-words max-w-[260px]">
+					{text}
+				</p>
+				<div className="flex items-start gap-2">
+					{!isInBin && (
+						<button onClick={onClickArchive}>
+							<span
+								className={
+									isInsideArchive
+										? "material-icons select-none"
+										: "material-icons-outlined select-none"
+								}
+							>
+								archive
+							</span>
+						</button>
+					)}
+
+					{!isInBin && (
+						<button
+							onClick={() => moveToBin(isInsideArchive ? "archive" : "home")}
+						>
+							<span className="material-icons select-none">delete_outline</span>
+						</button>
+					)}
 				</div>
 			</div>
 		</div>
